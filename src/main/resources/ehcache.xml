@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:noNamespaceSchemaLocation="ehcache.xsd" 
+	updateCheck="true" monitoring="autodetect"
+	 dynamicConfig="true">
+	 
+	 <diskStore path="E:/ehcache-cache"/>
+	 
+	 <!-- 
+12         defaultCache:默认的缓存配置信息,如果不加特殊说明,则所有对象按照此配置项处理
+13         maxElementsInMemory:设置了缓存的上限,最多存储多少个记录对象
+14         eternal:代表对象是否永不过期
+15         timeToIdleSeconds:最大的闲置时间
+16         timeToLiveSeconds:最大的存活时间
+17         overflowToDisk:是否允许对象被写入到磁盘
+		   copyOnRead:判断从缓存中读取数据时是返回对象的引用
+		   	还是复制一个对象返回。默认为false，即返回数据的引用，
+		   	这种情况下返回的都是相同的对象，若设置为true，每次读取
+		   	缓存时都会复制一个新的实例。
+		   copyOnWrite：写入缓存时是直接缓存对象的引用还是复制一个对象
+		    然后缓存，默认是false。如果想使用可读写缓存，就需要将其配置为true
+		    
+		    如果想使用ehcache的话只需在Mapper.xml中配置
+		  <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+18      -->
+	 <defaultCache
+	 	maxElementsInMemory="3000"
+	 	eternal="false"
+	 	copyOnRead="true"
+	 	copyOnWrite="true"
+	 	timeToIdleSeconds="3600"
+	 	timeToLiveSeconds="3600"
+	 	overflowToDisk="true"
+	 	diskPersistent="true"
+	 />
+</ehcache>

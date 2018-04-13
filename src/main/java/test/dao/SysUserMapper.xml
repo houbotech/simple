@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test.dao.SysUserMapper">
+  <resultMap id="BaseResultMap" type="test.model.SysUser">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="user_password" jdbcType="VARCHAR" property="userPassword" />
+    <result column="user_email" jdbcType="VARCHAR" property="userEmail" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="user_info" jdbcType="LONGVARCHAR" property="userInfo" />
+    <result column="head_img" jdbcType="LONGVARBINARY" property="headImg" />
+  </resultMap>
+  <resultMap type="test.model.SysUser" id="userRoleMapSelect" extends="BaseResultMap">
+  	<association property="sysRole" column="{id=role_id}"
+  		fetchType="lazy"
+  		select="test.dao.SysRoleMapper.selectByPrimaryKey"/>
+  </resultMap>
+  
+  <resultMap type="test.model.SysUser" id="userRoleListMapSelect"
+  	extends="BaseResultMap">
+  	<collection property="roleList"
+  				fetchType="lazy"
+  				column="{userId=id}"
+  				select="test.dao.SysRoleMapper.selectRoleByUserId"
+  		/>	
+  </resultMap>
+  
+  <select id="selectAllUserAndRolesSelect" resultMap="userRoleListMapSelect">
+  	select * from sys_user where id=#{id}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="test.model.SysUser">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into sys_user (id, user_name, user_password, 
+      user_email, create_time, user_info, 
+      head_img)
+    values (#{id,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{userPassword,jdbcType=VARCHAR}, 
+      #{userEmail,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{userInfo,jdbcType=LONGVARCHAR}, 
+      #{headImg,jdbcType=LONGVARBINARY})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="test.model.SysUser">
+    update sys_user
+    set user_name = #{userName,jdbcType=VARCHAR},
+      user_password = #{userPassword,jdbcType=VARCHAR},
+      user_email = #{userEmail,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      user_info = #{userInfo,jdbcType=LONGVARCHAR},
+      head_img = #{headImg,jdbcType=LONGVARBINARY}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, user_name, user_password, user_email, create_time, user_info, head_img
+    from sys_user
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, user_name, user_password, user_email, create_time, user_info, head_img
+    from sys_user
+  </select>
+  <select id="selectUserAndRoleById" resultMap="userRoleMapSelect">
+  	select
+  		u.id,
+  		u.user_name userName,
+  		u.user_password userPassword,
+  		u.user_email userEmail,
+  		u.user_info userInfo,
+  		u.head_img headImg,
+  		u.create_time createTime,
+  		ur.role_id
+  	from sys_user u
+  	inner join sys_user_role ur on u.id=ur.user_id
+  	where u.id = #{id}
+  </select>
+  
+  <select id="selectByIdList" resultMap="BaseResultMap">
+  		select * from sys_user where id in
+  		<foreach collection="idList" open="(" close=")" separator=","
+  			item="id" index="i">
+  				#{id}
+  			</foreach>
+  </select>
+  
+  <insert id="insertList">
+    
+    insert into sys_user (user_name, user_password, 
+      user_email, create_time, user_info, 
+      head_img) values
+  		<foreach collection="userList" item="user" separator=",">
+  			(
+  				#{user.userName},#{user.userPassword},#{user.userEmail},
+  				#{user.userInfo},#{user.headImg,jdbcType=BLOB},
+  				#{user.createTime,jdbcType=TIMESTAMP}
+  			)
+  		</foreach>
+  </insert>
+  
+  <update id="updateByMap">
+  	update sys_user
+  	set
+  	<foreach collection="map" item="val" index="key" separator=",">
+  		${key} = #{val}
+  	</foreach>
+  	where id=#{map.id}
+  </update>
+</mapper>

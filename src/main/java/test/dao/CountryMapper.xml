@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test.dao.CountryMapper">
+  <resultMap id="BaseResultMap" type="test.model.Country">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="countryname" jdbcType="VARCHAR" property="countryname" />
+    <result column="countrycode" jdbcType="VARCHAR" property="countrycode" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from country
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="test.model.Country">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into country (id, countryname, countrycode
+      )
+    values (#{id,jdbcType=INTEGER}, #{countryname,jdbcType=VARCHAR}, #{countrycode,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="test.model.Country">
+    update country
+    set countryname = #{countryname,jdbcType=VARCHAR},
+      countrycode = #{countrycode,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, countryname, countrycode
+    from country
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, countryname, countrycode
+    from country
+  </select> 
+  
+  <update id="updateAllMessage">
+    update country set countryname=#{countryname},countrycode=#{countrycode}
+  </update>
+  <select id="selectByCountry" resultType="Country">
+  	select * from country 
+  	<where>
+  		<if test="countryname!=null and countrycode!=''">
+  			and countryname like concat('%',#{countryname},'%')
+  		</if>
+  		<if test="countrycode!=null and countrycode!=''">
+  			and countrycode=#{countrycode}
+  		</if>
+  	</where>
+  </select>
+</mapper>
